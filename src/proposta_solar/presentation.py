@@ -183,12 +183,8 @@ class GraphManager:
         
         # Mapeamento de cores
         self.cores = {
-            'vermelho': '#FF0000',
-            'verde': '#00FF00',
-            'azul': '#0000FF',
-            'amarelo': '#FFFF00',
-            'roxo': '#800080',
-            'laranja': '#FFA500'
+            'vermelho': self.config.graph['cores']['vermelho'],
+            'verde': self.config.graph['cores']['verde']
         }
     
     def get_color(self, nome_cor):
