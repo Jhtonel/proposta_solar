@@ -206,8 +206,8 @@ ESTILO_GRAFICOS = {
     
     # Cores padrão
     'cores': {
-        'vermelho': '#FF0000',      # Cor para valores negativos/custos
-        'verde': '#00FF00'          # Cor para valores positivos/economia
+        'vermelho': '#DC2626',      # Cor para valores negativos/custos
+        'verde': '#059669'          # Cor para valores positivos/economia
     },
     
     # Configurações gerais

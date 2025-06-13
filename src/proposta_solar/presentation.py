@@ -226,6 +226,25 @@ class GraphManager:
             # Formato R$1000 para valores menores
             return f'R${x:,.0f}'.replace(',', '.')
     
+    def add_data_labels(self, x, y, color, offset=0):
+        """Adiciona labels aos pontos do gráfico"""
+        # Lista de índices para adicionar labels (primeiro, a cada 5 anos, e último)
+        indices = [0] + list(range(4, len(x), 5))  # Primeiro e a cada 5 anos
+        if len(x) - 1 not in indices:  # Adiciona o último se ainda não estiver incluído
+            indices.append(len(x) - 1)
+        
+        for i in indices:
+            plt.annotate(
+                self.format_currency(y[i]),
+                (x[i], y[i]),
+                xytext=(0, offset),
+                textcoords='offset points',
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black'
+            )
+    
     def save_graph(self, name):
         """Salva gráfico como imagem"""
         path = self.resources.get_path(f"{name}.png")
@@ -241,6 +260,14 @@ class GraphManager:
             for graph_id, graph_config in GRAFICOS.items():
                 plt.figure()
                 
+                # Configurar grid horizontal para gráficos específicos
+                if graph_id in ['graph1', 'graph3', 'graph4', 'graph5']:
+                    plt.grid(True, axis='y', linestyle='--', alpha=0.5)
+                
+                # Configurar grid vertical para gráfico 2
+                if graph_id == 'graph2':
+                    plt.grid(True, axis='x', linestyle='--', alpha=0.5)
+                
                 if graph_config['tipo'] == 'linha':
                     # Gráfico de linha simples
                     plt.plot(data[graph_id]['ano'], 
@@ -248,6 +275,13 @@ class GraphManager:
                            color=self.get_color(graph_config['cores']['valor']))
                     # Mostrar todos os anos
                     plt.xticks(data[graph_id]['ano'])
+                    # Adicionar labels a cada 5 anos
+                    if graph_id == 'graph2':
+                        self.add_data_labels(
+                            data[graph_id]['ano'],
+                            data[graph_id]['valor'],
+                            self.get_color(graph_config['cores']['valor'])
+                        )
                 
                 elif graph_config['tipo'] == 'linhas':
                     # Gráfico de múltiplas linhas
@@ -262,6 +296,20 @@ class GraphManager:
                     plt.legend(fontsize=10)
                     # Mostrar todos os anos
                     plt.xticks(data[graph_id]['ano'])
+                    # Adicionar labels a cada 5 anos
+                    if graph_id == 'graph5':
+                        self.add_data_labels(
+                            data[graph_id]['ano'],
+                            data[graph_id]['economia'],
+                            self.get_color(graph_config['cores']['economia']),
+                            offset=10
+                        )
+                        self.add_data_labels(
+                            data[graph_id]['ano'],
+                            data[graph_id]['custo'],
+                            self.get_color(graph_config['cores']['custo']),
+                            offset=-10
+                        )
                 
                 elif graph_config['tipo'] == 'barras':
                     if 'valor' in data[graph_id]:
