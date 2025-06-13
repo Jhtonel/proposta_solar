@@ -66,38 +66,38 @@ VARIAVEIS_SLIDES = {
 POSICOES_GRAFICOS = {
     'graph1': {
         'slide': 1,
-        'left': -6.65,    # cm
-        'top': -5.47,     # cm
-        'width': 24.13,  # cm
-        'height': 13.97  # cm
+        'left': 18.54,    # cm
+        'top': 8.83,      # cm
+        'width': 29.4,    # cm
+        'height': 17.02   # cm
     },
     'graph2': {
         'slide': 2,
-        'left': -6.65,    # cm
-        'top': -5.47, 
-        'width': 24.13,
-        'height': 13.97
+        'left': 18.54,    # cm
+        'top': 8.83,      # cm
+        'width': 29.4,    # cm
+        'height': 17.02   # cm
     },
     'graph3': {
         'slide': 3,
-        'left': -6.65,    # cm
-        'top': -5.47, 
-        'width': 24.13,
-        'height': 13.97
+        'left': 18.54,    # cm
+        'top': 8.83,      # cm
+        'width': 29.4,    # cm
+        'height': 17.02   # cm
     },
     'graph4': {
         'slide': 5,
-        'left': -6.65,    # cm
-        'top': -5.47, 
-        'width': 24.13,
-        'height': 13.97
+        'left': 18.54,    # cm
+        'top': 8.83,      # cm
+        'width': 29.4,    # cm
+        'height': 17.02   # cm
     },
     'graph5': {
         'slide': 9,
-        'left': -12.06,
-        'top': -4.11,
-        'width': 24.13,
-        'height': 13.97
+        'left': 12.66,    # cm
+        'top': 11.87,     # cm
+        'width': 24.97,    # cm
+        'height': 14.46   # cm
     }
 }
 
@@ -187,7 +187,7 @@ GRAFICOS = {
             'x': 'Anos',
             'y': 'Valor (R$)'
         },
-        'tipo': 'barras',
+        'tipo': 'linhas',
         'cores': {
             'economia': 'verde',
             'custo': 'vermelho'
@@ -199,8 +199,8 @@ GRAFICOS = {
 ESTILO_GRAFICOS = {
     # Dimensões do gráfico em centímetros
     'dimensoes': {
-        'largura': 24.13,           # Largura em cm
-        'altura': 13.97,            # Altura em cm
+        'largura': 29.4,            # Largura em cm
+        'altura': 17.02,            # Altura em cm
         'cm_para_polegadas': 0.393701  # Fator de conversão cm -> polegadas
     },
     

@@ -205,17 +205,26 @@ class GraphManager:
             ],
             'figure.dpi': self.config.graph['geral']['dpi'],
             'savefig.dpi': self.config.graph['geral']['dpi'],
-            'font.size': self.config.graph['geral']['tamanho_fonte'],
+            'font.size': 10,  # Tamanho da fonte padrão
             'axes.grid': self.config.graph['geral']['mostrar_grade'],
             'axes.spines.top': self.config.graph['geral']['mostrar_borda']['topo'],
             'axes.spines.right': self.config.graph['geral']['mostrar_borda']['direita'],
             'figure.constrained_layout.use': True,
-            'figure.autolayout': False
+            'figure.autolayout': False,
+            'figure.facecolor': 'none',  # Fundo transparente
+            'axes.facecolor': 'none',    # Fundo transparente
+            'savefig.facecolor': 'none', # Fundo transparente ao salvar
+            'savefig.transparent': True  # Garante transparência ao salvar
         })
     
     def format_currency(self, x, p=None):
         """Formata valores monetários para o matplotlib"""
-        return f'R$ {x:,.2f}'.replace(',', '_').replace('.', ',').replace('_', '.')
+        if abs(x) >= 100000:
+            # Formato 1k para valores acima de 100 mil
+            return f'R${x/1000:.0f}k'
+        else:
+            # Formato R$1000 para valores menores
+            return f'R${x:,.0f}'.replace(',', '.')
     
     def save_graph(self, name):
         """Salva gráfico como imagem"""
@@ -237,6 +246,22 @@ class GraphManager:
                     plt.plot(data[graph_id]['ano'], 
                            data[graph_id]['valor'],
                            color=self.get_color(graph_config['cores']['valor']))
+                    # Mostrar todos os anos
+                    plt.xticks(data[graph_id]['ano'])
+                
+                elif graph_config['tipo'] == 'linhas':
+                    # Gráfico de múltiplas linhas
+                    plt.plot(data[graph_id]['ano'],
+                           data[graph_id]['economia'],
+                           label='Economia',
+                           color=self.get_color(graph_config['cores']['economia']))
+                    plt.plot(data[graph_id]['ano'],
+                           data[graph_id]['custo'],
+                           label='Custo',
+                           color=self.get_color(graph_config['cores']['custo']))
+                    plt.legend(fontsize=10)
+                    # Mostrar todos os anos
+                    plt.xticks(data[graph_id]['ano'])
                 
                 elif graph_config['tipo'] == 'barras':
                     if 'valor' in data[graph_id]:
@@ -244,6 +269,8 @@ class GraphManager:
                         plt.bar(data[graph_id]['ano'], 
                                data[graph_id]['valor'],
                                color=self.get_color(graph_config['cores']['valor']))
+                        # Mostrar todos os anos
+                        plt.xticks(data[graph_id]['ano'])
                     elif 'positivo' in data[graph_id]:
                         # Gráfico de barras duplas (positivo/negativo)
                         plt.bar(data[graph_id]['ano'], 
@@ -252,15 +279,47 @@ class GraphManager:
                         plt.bar(data[graph_id]['ano'], 
                                data[graph_id]['negativo'],
                                color=self.get_color(graph_config['cores']['negativo']))
+                        # Mostrar todos os anos
+                        plt.xticks(data[graph_id]['ano'])
+                
+                elif graph_config['tipo'] == 'barras_duplas':
+                    # Gráfico de barras duplas (produção vs consumo)
+                    x = range(len(data[graph_id]['mes']))
+                    width = 0.35
+                    
+                    plt.bar([i - width/2 for i in x], 
+                           data[graph_id]['producao'],
+                           width,
+                           label='Produção',
+                           color=self.get_color(graph_config['cores']['producao']))
+                    
+                    plt.bar([i + width/2 for i in x], 
+                           data[graph_id]['consumo'],
+                           width,
+                           label='Consumo',
+                           color=self.get_color(graph_config['cores']['consumo']))
+                    
+                    plt.xticks(x, data[graph_id]['mes'])
+                    plt.legend(fontsize=10)
                 
                 # Configurar título e labels
-                plt.title(graph_config['titulo'])
-                plt.xlabel(graph_config['eixos']['x'])
-                plt.ylabel(graph_config['eixos']['y'])
+                plt.title(graph_config['titulo'], fontsize=10)
+                plt.xlabel(graph_config['eixos']['x'], fontsize=10)
+                plt.ylabel(graph_config['eixos']['y'], fontsize=10)
                 
                 # Configurar formatação do eixo Y para valores monetários
-                if graph_config.get('formato_monetario', False):
+                if 'Valor (R$)' in graph_config['eixos']['y']:
                     plt.gca().yaxis.set_major_formatter(FuncFormatter(self.format_currency))
+                
+                # Configurar tamanho dos ticks
+                plt.xticks(fontsize=10)
+                plt.yticks(fontsize=10)
+                
+                # Rotacionar labels do eixo x para melhor legibilidade
+                plt.xticks(rotation=45)
+                
+                # Ajustar layout para evitar corte de labels
+                plt.tight_layout()
                 
                 # Salvar gráfico
                 graph_paths[graph_id] = self.save_graph(f"graph_{graph_id}")
