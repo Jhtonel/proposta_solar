@@ -115,7 +115,9 @@ GRAFICOS = {
             'y': 'Valor (R$)'
         },
         'tipo': 'barras',            # Gráfico de barras
-        'cor': 'vermelho'
+        'cores': {
+            'valor': 'vermelho'
+        }
     },
     
     # Gráfico 2: Evolução da Conta de Energia
@@ -130,7 +132,9 @@ GRAFICOS = {
             'y': 'Valor (R$)'
         },
         'tipo': 'linha',
-        'cor': 'vermelho'
+        'cores': {
+            'valor': 'vermelho'
+        }
     },
     
     # Gráfico 3: Produção vs Consumo Mensal

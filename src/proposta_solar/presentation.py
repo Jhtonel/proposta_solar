@@ -236,27 +236,27 @@ class GraphManager:
                     # Gráfico de linha simples
                     plt.plot(data[graph_id]['ano'], 
                            data[graph_id]['valor'],
-                           color=self.get_color(graph_config['cor']))
+                           color=self.get_color(graph_config['cores']['valor']))
                 
                 elif graph_config['tipo'] == 'barras':
                     if 'valor' in data[graph_id]:
                         # Gráfico de barras simples
                         plt.bar(data[graph_id]['ano'], 
                                data[graph_id]['valor'],
-                               color=self.get_color(graph_config['cor']))
+                               color=self.get_color(graph_config['cores']['valor']))
                     elif 'positivo' in data[graph_id]:
                         # Gráfico de barras duplas (positivo/negativo)
                         plt.bar(data[graph_id]['ano'], 
                                data[graph_id]['positivo'],
-                               color=self.get_color(graph_config['cor']))
+                               color=self.get_color(graph_config['cores']['positivo']))
                         plt.bar(data[graph_id]['ano'], 
                                data[graph_id]['negativo'],
-                               color=self.get_color(graph_config['cor_negativo']))
+                               color=self.get_color(graph_config['cores']['negativo']))
                 
                 # Configurar título e labels
                 plt.title(graph_config['titulo'])
-                plt.xlabel(graph_config['eixo_x'])
-                plt.ylabel(graph_config['eixo_y'])
+                plt.xlabel(graph_config['eixos']['x'])
+                plt.ylabel(graph_config['eixos']['y'])
                 
                 # Configurar formatação do eixo Y para valores monetários
                 if graph_config.get('formato_monetario', False):
