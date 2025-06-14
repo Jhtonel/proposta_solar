@@ -14,6 +14,7 @@ from matplotlib.ticker import FuncFormatter
 from openpyxl import load_workbook
 import re
 from .variaveis import VARIAVEIS_PLANILHA, GRAFICOS, ESTILO_GRAFICOS, POSICOES_GRAFICOS, VARIAVEIS_SLIDES
+from copy import deepcopy
 
 # Configuração de logging
 logging.basicConfig(
@@ -460,116 +461,93 @@ class PresentationManager:
                 if expected_vars:
                     logger.info(f"Variáveis esperadas no Slide {slide_idx + 1}: {', '.join(expected_vars)}")
                 
-                # Primeiro, vamos coletar todas as variáveis e suas localizações no slide
-                variables_to_replace = []  # Lista de tuplas (run, var_name, original_text)
+                # Encontrar todas as variáveis no slide
+                variables_to_replace = []
                 found_vars = set()  # Conjunto para rastrear variáveis encontradas
                 
-                # Função para processar um text_frame
-                def process_text_frame(text_frame, is_table=False):
-                    for paragraph in text_frame.paragraphs:
-                        # Log do texto completo do parágrafo
-                        paragraph_text = paragraph.text
-                        if '{{' in paragraph_text:
-                            logger.info(f"Texto do parágrafo: [{repr(paragraph_text)}]")
-                        
-                        for run in paragraph.runs:
-                            text = run.text
-                            if '{{' in text or '}}' in text:
-                                # Log detalhado do texto do run
-                                logger.info(f"Texto do run: [{repr(text)}]")
-                                
-                                if '{{' in text and '}}' in text:
-                                    match = re.search(r'\{\{([^}]+)\}\}', text)
-                                    if match:
-                                        var_name = match.group(1)
-                                        # Log detalhado da variável encontrada
-                                        logger.info(f"Variável encontrada: [{repr(var_name)}] no texto [{repr(text)}]")
-                                        found_vars.add(var_name.lower())
-                                        variables_to_replace.append((run, var_name, text))
-                                    else:
-                                        # Log quando encontramos {{ e }} mas não conseguimos extrair a variável
-                                        logger.warning(f"Encontrado {{ e }} mas não foi possível extrair variável do texto: [{repr(text)}]")
-                                else:
-                                    # Log quando encontramos apenas um dos delimitadores
-                                    logger.warning(f"Encontrado delimitador incompleto no texto: [{repr(text)}]")
-                
-                # Processar todas as shapes do slide
                 for shape in slide.shapes:
                     if hasattr(shape, "text_frame"):
-                        process_text_frame(shape.text_frame)
-                    elif hasattr(shape, "table"):
-                        for row in shape.table.rows:
-                            for cell in row.cells:
-                                process_text_frame(cell.text_frame, is_table=True)
+                        for paragraph in shape.text_frame.paragraphs:
+                            for run in paragraph.runs:
+                                # Procurar por padrões de variável no texto
+                                matches = re.finditer(r'{{([^}]+)}}', run.text)
+                                for match in matches:
+                                    var_name = match.group(1)
+                                    logger.info(f"Encontrada variável no texto: {var_name} em {run.text}")
+                                    variables_to_replace.append((run, var_name, match.group(0)))
+                                    found_vars.add(var_name.lower())
                 
                 # Verificar se todas as variáveis esperadas foram encontradas
                 if expected_vars:
                     expected_vars_lower = {v.lower() for v in expected_vars}
-                    missing_vars = expected_vars_lower - {v.lower() for v in found_vars}
+                    missing_vars = expected_vars_lower - found_vars
                     if missing_vars:
                         logger.warning(f"\n⚠️ Variáveis não encontradas no Slide {slide_idx + 1}:")
                         for var in missing_vars:
                             logger.warning(f"  - {var}")
                     
-                    extra_vars = {v.lower() for v in found_vars} - expected_vars_lower
+                    extra_vars = found_vars - expected_vars_lower
                     if extra_vars:
                         logger.warning(f"\n⚠️ Variáveis encontradas mas não esperadas no Slide {slide_idx + 1}:")
                         for var in extra_vars:
                             logger.warning(f"  - {var}")
                 
-                # Agora que temos todas as variáveis, vamos substituí-las uma por uma
-                logger.info(f"\nSubstituindo variáveis no Slide {slide_idx + 1}:")
-                substituted_vars = set()  # Conjunto para rastrear variáveis substituídas
-                
+                # Substituir as variáveis encontradas
+                substituted_vars = set()
                 for run, var_name, original_text in variables_to_replace:
                     # Tentar substituir com o caso exato, depois minúsculo, depois maiúsculo
                     replaced = False
                     for test_name in [var_name, var_name.lower(), var_name.upper()]:
                         if test_name in variables:
                             value = str(variables[test_name])
+                            logger.info(f"Tentando substituir {test_name} com valor: {value}")
                             
-                            # Se o texto contém quebras de linha, precisamos criar novos parágrafos
-                            if '\n' in value:
-                                # Encontrar o shape que contém este run
-                                shape = None
-                                for s in slide.shapes:
-                                    if hasattr(s, "text_frame"):
-                                        for p in s.text_frame.paragraphs:
-                                            if run in p.runs:
-                                                shape = s
-                                                break
-                                    if shape:
-                                        break
-                                
-                                if shape:
-                                    # Dividir o texto em linhas
-                                    lines = value.split('\n')
-                                    
-                                    # Limpar o texto atual
-                                    run.text = ''
-                                    
-                                    # Adicionar cada linha como um novo parágrafo
-                                    for i, line in enumerate(lines):
-                                        if i == 0:
-                                            # Primeira linha vai no parágrafo atual
-                                            run.text = line
+                            # Encontrar o shape que contém este run
+                            for shape in slide.shapes:
+                                if hasattr(shape, "text_frame"):
+                                    # Verificar se o texto do shape contém a variável
+                                    if original_text in shape.text:
+                                        # Se o texto contém quebras de linha
+                                        if "\n" in value:
+                                            # Dividir o texto em linhas
+                                            lines = value.split("\n")
+                                            # Limpar o texto frame
+                                            shape.text_frame.clear()
+                                            # Adicionar cada linha como um novo parágrafo
+                                            for line in lines:
+                                                p = shape.text_frame.add_paragraph()
+                                                p.text = line
+                                                # Copiar a formatação do run original
+                                                for new_run in p.runs:
+                                                    new_run.font.size = run.font.size
+                                                    new_run.font.bold = run.font.bold
+                                                    new_run.font.italic = run.font.italic
+                                                    new_run.font.underline = run.font.underline
+                                                    if hasattr(run.font, 'color') and run.font.color:
+                                                        new_run.font.color.rgb = run.font.color.rgb
                                         else:
-                                            # Linhas subsequentes vão em novos parágrafos
-                                            p = shape.text_frame.add_paragraph()
-                                            p.text = line
-                                            # Copiar a formatação do run original para o primeiro run do novo parágrafo
-                                            if p.runs:
-                                                self._copy_run_format(run, p.runs[0])
-                            else:
-                                run.text = value
-                            
-                            replaced = True
-                            substituted_vars.add(var_name.lower())
-                            logger.info(f"✓ Substituída variável {var_name} = {value}")
-                            break
+                                            # Se não há quebras de linha, substituir mantendo a formatação
+                                            for paragraph in shape.text_frame.paragraphs:
+                                                if original_text in paragraph.text:
+                                                    paragraph.text = value
+                                                    # Copiar a formatação do run original
+                                                    for new_run in paragraph.runs:
+                                                        new_run.font.size = run.font.size
+                                                        new_run.font.bold = run.font.bold
+                                                        new_run.font.italic = run.font.italic
+                                                        new_run.font.underline = run.font.underline
+                                                        if hasattr(run.font, 'color') and run.font.color:
+                                                            new_run.font.color.rgb = run.font.color.rgb
+                                        
+                                        replaced = True
+                                        substituted_vars.add(var_name.lower())
+                                        logger.info(f"✓ Substituída variável {var_name} = {value}")
+                                        break
+                            if replaced:
+                                break
                     
                     if not replaced:
-                        logger.warning(f"✗ Variável {var_name} não encontrada no dicionário de variáveis")
+                        logger.warning(f"✗ Variável {var_name} não encontrada para substituição")
                     
                     # Registrar para o log final
                     all_vars.add((var_name, original_text))
