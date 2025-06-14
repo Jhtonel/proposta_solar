@@ -15,6 +15,7 @@ from openpyxl import load_workbook
 import re
 from .variaveis import VARIAVEIS_PLANILHA, GRAFICOS, ESTILO_GRAFICOS, POSICOES_GRAFICOS, VARIAVEIS_SLIDES
 from copy import deepcopy
+import numpy as np
 
 # Configuração de logging
 logging.basicConfig(
@@ -214,7 +215,8 @@ class GraphManager:
             'figure.facecolor': 'none',  # Fundo transparente
             'axes.facecolor': 'none',    # Fundo transparente
             'savefig.facecolor': 'none', # Fundo transparente ao salvar
-            'savefig.transparent': True  # Garante transparência ao salvar
+            'savefig.transparent': True,  # Garante transparência ao salvar
+            'font.family': 'Poppins'      # Fonte padrão Poppins
         })
     
     def format_currency(self, x, p=None):
@@ -226,14 +228,11 @@ class GraphManager:
             # Formato R$1000 para valores menores
             return f'R${x:,.0f}'.replace(',', '.')
     
-    def add_data_labels(self, x, y, color, offset=0):
+    def add_data_labels(self, x, y, color, offset=0, only_nonzero=False):
         """Adiciona labels aos pontos do gráfico"""
-        # Lista de índices para adicionar labels (primeiro, a cada 5 anos, e último)
-        indices = [0] + list(range(4, len(x), 5))  # Primeiro e a cada 5 anos
-        if len(x) - 1 not in indices:  # Adiciona o último se ainda não estiver incluído
-            indices.append(len(x) - 1)
-        
-        for i in indices:
+        for i in range(len(x)):
+            if only_nonzero and y[i] == 0:
+                continue
             plt.annotate(
                 self.format_currency(y[i]),
                 (x[i], y[i]),
@@ -241,8 +240,11 @@ class GraphManager:
                 textcoords='offset points',
                 ha='center',
                 va='bottom',
-                fontsize=12,
-                color='black'
+                fontsize=14,
+                color='black',
+                rotation=90,
+                fontweight='bold',
+                fontname='Poppins'
             )
     
     def save_graph(self, name):
@@ -265,7 +267,7 @@ class GraphManager:
                     plt.grid(True, axis='y', linestyle='--', alpha=0.5)
                 
                 # Configurar grid vertical para gráfico 2
-                if graph_id == 'graph2':
+                if graph_id in ['graph2', 'graph5']:
                     plt.grid(True, axis='x', linestyle='--', alpha=0.5)
                 
                 if graph_config['tipo'] == 'linha':
@@ -275,8 +277,8 @@ class GraphManager:
                            color=self.get_color(graph_config['cores']['valor']))
                     # Mostrar todos os anos
                     plt.xticks(data[graph_id]['ano'])
-                    # Adicionar labels a cada 5 anos
-                    if graph_id == 'graph2':
+                    # Adicionar labels para todos os anos
+                    if graph_id == 'graph2' or graph_id == 'graph1':
                         self.add_data_labels(
                             data[graph_id]['ano'],
                             data[graph_id]['valor'],
@@ -296,20 +298,29 @@ class GraphManager:
                     plt.legend(fontsize=10)
                     # Mostrar todos os anos
                     plt.xticks(data[graph_id]['ano'])
-                    # Adicionar labels a cada 5 anos
+                    # Adicionar labels a cada 5 anos, primeiro e último
                     if graph_id == 'graph5':
-                        self.add_data_labels(
-                            data[graph_id]['ano'],
-                            data[graph_id]['economia'],
-                            self.get_color(graph_config['cores']['economia']),
-                            offset=10
-                        )
-                        self.add_data_labels(
-                            data[graph_id]['ano'],
-                            data[graph_id]['custo'],
-                            self.get_color(graph_config['cores']['custo']),
-                            offset=-10
-                        )
+                        anos = data[graph_id]['ano']
+                        for serie, cor, offset in [
+                            ('economia', self.get_color(graph_config['cores']['economia']), 10),
+                            ('custo', self.get_color(graph_config['cores']['custo']), -10)
+                        ]:
+                            indices = [0] + list(range(4, len(anos), 5))
+                            if len(anos) - 1 not in indices:
+                                indices.append(len(anos) - 1)
+                            for i in indices:
+                                plt.annotate(
+                                    self.format_currency(data[graph_id][serie][i]),
+                                    (anos[i], data[graph_id][serie][i]),
+                                    xytext=(0, offset),
+                                    textcoords='offset points',
+                                    ha='center',
+                                    va='bottom',
+                                    fontsize=14,
+                                    color='black',
+                                    fontweight='bold',
+                                    fontname='Poppins'
+                                )
                 
                 elif graph_config['tipo'] == 'barras':
                     if 'valor' in data[graph_id]:
@@ -319,6 +330,13 @@ class GraphManager:
                                color=self.get_color(graph_config['cores']['valor']))
                         # Mostrar todos os anos
                         plt.xticks(data[graph_id]['ano'])
+                        # Adicionar labels para todos os anos
+                        if graph_id == 'graph1':
+                            self.add_data_labels(
+                                data[graph_id]['ano'],
+                                data[graph_id]['valor'],
+                                self.get_color(graph_config['cores']['valor'])
+                            )
                     elif 'positivo' in data[graph_id]:
                         # Gráfico de barras duplas (positivo/negativo)
                         plt.bar(data[graph_id]['ano'], 
@@ -329,6 +347,20 @@ class GraphManager:
                                color=self.get_color(graph_config['cores']['negativo']))
                         # Mostrar todos os anos
                         plt.xticks(data[graph_id]['ano'])
+                        # Adicionar labels para todos os anos
+                        if graph_id == 'graph4':
+                            self.add_data_labels(
+                                data[graph_id]['ano'],
+                                data[graph_id]['positivo'],
+                                self.get_color(graph_config['cores']['positivo']),
+                                only_nonzero=True
+                            )
+                            self.add_data_labels(
+                                data[graph_id]['ano'],
+                                data[graph_id]['negativo'],
+                                self.get_color(graph_config['cores']['negativo']),
+                                only_nonzero=True
+                            )
                 
                 elif graph_config['tipo'] == 'barras_duplas':
                     # Gráfico de barras duplas (produção vs consumo)
@@ -377,6 +409,69 @@ class GraphManager:
             raise
         
         return graph_paths
+
+    def _create_custo_acumulado_chart(self, data):
+        """Cria o gráfico de Custo Acumulado S. Energia Solar"""
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(data['ano'], data['valor'], marker='o', linestyle='-', color='#FF6B6B')
+        ax.set_title('Custo Acumulado S. Energia Solar', pad=20)
+        ax.set_xlabel('Anos')
+        ax.set_ylabel('Valor (R$)')
+        ax.grid(True, linestyle='--', alpha=0.7)
+        
+        # Adicionar labels verticais
+        for x, y in zip(data['ano'], data['valor']):
+            ax.text(x, y, f'R${y:,.2f}', rotation=90, va='bottom', ha='center', color='black')
+        
+        plt.tight_layout()
+        return fig
+
+    def _create_evolucao_conta_chart(self, data):
+        """Cria o gráfico de Evolução da Conta Média/Mês"""
+        fig, ax = plt.subplots(figsize=(10, 6))
+        anos = list(data['ano'])
+        valores = list(data['valor'])
+        ax.plot(anos, valores, marker='o', linestyle='-', color='#4ECDC4')
+        ax.set_title('Evolução da Conta Média/Mês', pad=20)
+        ax.set_xlabel('Anos')
+        ax.set_ylabel('Valor (R$)')
+        ax.grid(True, linestyle='--', alpha=0.7)
+        ax.set_xticks(anos)
+        
+        # Adicionar labels verticais para todos os anos
+        for x, y in zip(anos, valores):
+            ax.text(x, y, f'R${y:,.2f}', rotation=90, va='bottom', ha='center', color='black')
+        
+        plt.tight_layout()
+        return fig
+
+    def _create_fluxo_caixa_chart(self, data):
+        """Cria o gráfico de Fluxo de Caixa"""
+        fig, ax = plt.subplots(figsize=(10, 6))
+        x = np.arange(len(data['ano']))
+        width = 0.35
+        
+        # Plotar barras positivas e negativas
+        ax.bar(x, data['positivo'], width, label='Entradas', color='#4ECDC4')
+        ax.bar(x, data['negativo'], width, label='Saídas', color='#FF6B6B')
+        
+        ax.set_title('Fluxo de Caixa', pad=20)
+        ax.set_xlabel('Anos')
+        ax.set_ylabel('Valor (R$)')
+        ax.set_xticks(x)
+        ax.set_xticklabels(data['ano'])
+        ax.legend()
+        ax.grid(True, linestyle='--', alpha=0.7)
+        
+        # Adicionar labels verticais
+        for i, (pos, neg) in enumerate(zip(data['positivo'], data['negativo'])):
+            if pos != 0:
+                ax.text(i, pos, f'R${pos:,.2f}', rotation=90, va='bottom', ha='center', color='black')
+            if neg != 0:
+                ax.text(i, neg, f'R${neg:,.2f}', rotation=90, va='top', ha='center', color='black')
+        
+        plt.tight_layout()
+        return fig
 
 class PresentationManager:
     """Gerencia criação e edição da apresentação"""
@@ -530,6 +625,7 @@ class PresentationManager:
                                                     new_run.font.underline = run.font.underline
                                                     if hasattr(run.font, 'color') and run.font.color:
                                                         new_run.font.color.rgb = run.font.color.rgb
+                                                        new_run.font.name = 'Poppins'
                                         else:
                                             # Se não há quebras de linha, substituir mantendo a formatação
                                             for paragraph in shape.text_frame.paragraphs:
@@ -543,6 +639,7 @@ class PresentationManager:
                                                         new_run.font.underline = run.font.underline
                                                         if hasattr(run.font, 'color') and run.font.color:
                                                             new_run.font.color.rgb = run.font.color.rgb
+                                                            new_run.font.name = 'Poppins'
                                         
                                         replaced = True
                                         substituted_vars.add(var_name.lower())
