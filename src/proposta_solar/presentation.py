@@ -86,7 +86,7 @@ class ExcelReader:
             
             # Log do conteúdo da aba
             logger.info(f"Conteúdo da aba 'Variáveis':")
-            for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+            for row in sheet.iter_rows(min_row=1, max_row=2, min_col=1, max_col=sheet.max_column):
                 for cell in row:
                     logger.info(f"  {cell.coordinate}: {cell.value}")
             
@@ -97,6 +97,9 @@ class ExcelReader:
             for var_name, cell_coord in VARIAVEIS_PLANILHA.items():
                 cell = sheet[cell_coord]
                 if cell.value is not None:
+                    # Se a célula estiver além da linha 2, pular
+                    if cell.row > 2:
+                        continue
                     variables[var_name] = str(cell.value)
                     logger.info(f"✓ Variável encontrada: {var_name} = {cell.value} (célula {cell_coord})")
                 else:
@@ -524,7 +527,42 @@ class PresentationManager:
                     for test_name in [var_name, var_name.lower(), var_name.upper()]:
                         if test_name in variables:
                             value = str(variables[test_name])
-                            run.text = value  # Substituir o texto completo do run
+                            
+                            # Se o texto contém quebras de linha, precisamos criar novos parágrafos
+                            if '\n' in value:
+                                # Encontrar o shape que contém este run
+                                shape = None
+                                for s in slide.shapes:
+                                    if hasattr(s, "text_frame"):
+                                        for p in s.text_frame.paragraphs:
+                                            if run in p.runs:
+                                                shape = s
+                                                break
+                                    if shape:
+                                        break
+                                
+                                if shape:
+                                    # Dividir o texto em linhas
+                                    lines = value.split('\n')
+                                    
+                                    # Limpar o texto atual
+                                    run.text = ''
+                                    
+                                    # Adicionar cada linha como um novo parágrafo
+                                    for i, line in enumerate(lines):
+                                        if i == 0:
+                                            # Primeira linha vai no parágrafo atual
+                                            run.text = line
+                                        else:
+                                            # Linhas subsequentes vão em novos parágrafos
+                                            p = shape.text_frame.add_paragraph()
+                                            p.text = line
+                                            # Copiar a formatação do run original para o primeiro run do novo parágrafo
+                                            if p.runs:
+                                                self._copy_run_format(run, p.runs[0])
+                            else:
+                                run.text = value
+                            
                             replaced = True
                             substituted_vars.add(var_name.lower())
                             logger.info(f"✓ Substituída variável {var_name} = {value}")

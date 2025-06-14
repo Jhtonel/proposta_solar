@@ -51,7 +51,7 @@ VARIAVEIS_SLIDES = {
     0: ['data', 'representante_nome', 'cargo', 'cliente', 'projeto_tipo'],                                                         # Slide 1 (índice 0)
     1: ['cliente', 'cenario_atual', 'gasto_5_anos', 'gasto_10_anos', 'gasto_25_anos'],                                             # Slide 2
     2: ['cliente', 'por_que_aumenta'],                                                                                             # Slide 3
-    3: ['cliente', 'producao_mensal'],                                                                                             # Slide 4
+    3: ['cliente', 'com_energia_solar'],                                                                                             # Slide 4
     4: ['cliente'],                                                                                                                # Slide 5
     5: ['cliente', 'economia_5_anos', 'economia_10_anos', 'economia_25_anos'],                                                     # Slide 6
     6: ['cliente'],                                                                                                                # Slide 7
