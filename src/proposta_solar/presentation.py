@@ -500,6 +500,11 @@ class PresentationManager:
                     for test_name in [var_name, var_name.lower(), var_name.upper()]:
                         if test_name in variables:
                             value = str(variables[test_name])
+                            
+                            # Tratamento especial para a variável cliente
+                            if var_name.lower() == 'cliente' and slide_idx > 0:
+                                value = value.upper()
+                            
                             logger.info(f"Tentando substituir {test_name} com valor: {value}")
                             
                             # Encontrar o shape que contém este run
