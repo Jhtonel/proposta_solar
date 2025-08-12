@@ -17,6 +17,14 @@ from .variaveis import VARIAVEIS_PLANILHA, GRAFICOS, ESTILO_GRAFICOS, POSICOES_G
 from copy import deepcopy
 import numpy as np
 
+# Importações para conversão PDF
+try:
+    import comtypes.client
+    PDF_CONVERSION_AVAILABLE = True
+except ImportError:
+    PDF_CONVERSION_AVAILABLE = False
+    logging.warning("comtypes não disponível. Conversão para PDF será desabilitada.")
+
 # Configuração de logging
 logging.basicConfig(
     level=logging.INFO,
@@ -698,7 +706,95 @@ class PresentationManager:
         """Salva apresentação"""
         self.presentation.save(output_path)
 
-def main(excel_path=None, template_path=None, output_path=None, verbose=False):
+class PDFConverter:
+    """Converte apresentações PPTX para PDF"""
+    
+    def __init__(self):
+        self.available = PDF_CONVERSION_AVAILABLE
+        if not self.available:
+            logger.warning("Conversão para PDF não disponível. Instale comtypes: pip install comtypes")
+    
+    def convert_pptx_to_pdf(self, pptx_path, pdf_path):
+        """Converte arquivo PPTX para PDF usando PowerPoint"""
+        if not self.available:
+            logger.error("Conversão para PDF não disponível")
+            return False
+        
+        try:
+            logger.info(f"Convertendo {pptx_path} para PDF...")
+            
+            # Inicializar PowerPoint
+            powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
+            powerpoint.Visible = True
+            
+            # Abrir apresentação
+            presentation = powerpoint.Presentations.Open(str(pptx_path))
+            
+            # Salvar como PDF
+            presentation.SaveAs(str(pdf_path), 32)  # 32 = ppSaveAsPDF
+            
+            # Fechar apresentação e PowerPoint
+            presentation.Close()
+            powerpoint.Quit()
+            
+            logger.info(f"✅ PDF gerado com sucesso: {pdf_path}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao converter para PDF: {e}")
+            return False
+    
+    def convert_pptx_to_pdf_alternative(self, pptx_path, pdf_path):
+        """Método alternativo usando LibreOffice (se disponível)"""
+        try:
+            import subprocess
+            import platform
+            
+            # Verificar se LibreOffice está disponível
+            if platform.system() == "Windows":
+                libreoffice_paths = [
+                    r"C:\Program Files\LibreOffice\program\soffice.exe",
+                    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"
+                ]
+            else:
+                libreoffice_paths = ["libreoffice", "soffice"]
+            
+            libreoffice_cmd = None
+            for path in libreoffice_paths:
+                try:
+                    subprocess.run([path, "--version"], capture_output=True, check=True)
+                    libreoffice_cmd = path
+                    break
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    continue
+            
+            if not libreoffice_cmd:
+                logger.error("LibreOffice não encontrado para conversão alternativa")
+                return False
+            
+            # Converter usando LibreOffice
+            cmd = [
+                libreoffice_cmd,
+                "--headless",
+                "--convert-to", "pdf",
+                "--outdir", str(pdf_path.parent),
+                str(pptx_path)
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                logger.info(f"✅ PDF gerado com LibreOffice: {pdf_path}")
+                return True
+            else:
+                logger.error(f"❌ Erro no LibreOffice: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"❌ Erro no método alternativo: {e}")
+            return False
+
+def main(excel_path=None, template_path=None, output_path=None, verbose=False, save_pdf=True):
     """Função principal"""
     try:
         # Configurar logging
@@ -751,10 +847,29 @@ def main(excel_path=None, template_path=None, output_path=None, verbose=False):
             # Substituir variáveis
             prs_mgr.replace_variables(variables)
             
-            # Salvar resultado
+            # Salvar PPTX
             prs_mgr.save(output_path)
+            print(f"✅ Apresentação PPTX gerada: {output_path}")
+            
+            # Converter para PDF se solicitado
+            if save_pdf:
+                pdf_path = output_path.with_suffix('.pdf')
+                pdf_converter = PDFConverter()
+                
+                # Tentar conversão com PowerPoint primeiro
+                success = pdf_converter.convert_pptx_to_pdf(output_path, pdf_path)
+                
+                # Se falhar, tentar com LibreOffice
+                if not success:
+                    logger.info("Tentando conversão alternativa com LibreOffice...")
+                    success = pdf_converter.convert_pptx_to_pdf_alternative(output_path, pdf_path)
+                
+                if success:
+                    print(f"✅ Apresentação PDF gerada: {pdf_path}")
+                else:
+                    print("⚠️ Não foi possível gerar o PDF. Apenas o arquivo PPTX foi criado.")
+                    print("Para gerar PDF, instale o PowerPoint ou LibreOffice.")
         
-        print("✅ Apresentação gerada com sucesso!")
         return 0
     
     except Exception as e:

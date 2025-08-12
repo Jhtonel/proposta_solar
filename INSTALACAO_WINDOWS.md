@@ -16,6 +16,11 @@ Este guia fornece instruções detalhadas para instalar e executar o sistema Pro
 - Baixe o Git em: https://git-scm.com/download/win
 - Permite clonar o repositório diretamente
 
+### 3. Software para conversão PDF (opcional)
+Para gerar arquivos PDF, você precisa de um dos seguintes:
+- **Microsoft PowerPoint** (recomendado) - Já incluído no Office
+- **LibreOffice** (alternativa gratuita) - Baixe em https://www.libreoffice.org/download/download/
+
 ## Métodos de Instalação
 
 ### Método 1: Execução Simples (Recomendado)
@@ -39,6 +44,7 @@ O script irá:
 - Instalar todas as dependências
 - Criar as pastas necessárias
 - Executar o sistema
+- **Gerar tanto PPTX quanto PDF**
 
 ### Método 2: PowerShell (Alternativa Moderna)
 
@@ -103,8 +109,42 @@ O script irá:
    - Ou via linha de comando: `python -m proposta_solar.cli`
 
 2. **Resultado**:
-   - A apresentação será gerada na pasta `output/`
-   - O arquivo será aberto automaticamente
+   - A apresentação PPTX será gerada na pasta `output/`
+   - A apresentação PDF será gerada na pasta `output/`
+   - O arquivo PPTX será aberto automaticamente
+
+### Opções de Linha de Comando
+
+```cmd
+# Gerar PPTX e PDF (padrão)
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx
+
+# Gerar apenas PPTX (sem PDF)
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx --no-pdf
+
+# Com logs detalhados
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx --verbose
+```
+
+## Conversão para PDF
+
+O sistema gera automaticamente arquivos PDF usando:
+
+### Método Principal (Windows)
+- **Microsoft PowerPoint** - Se você tem o Office instalado
+- O sistema detecta automaticamente e usa o PowerPoint
+
+### Método Alternativo
+- **LibreOffice** - Software gratuito e de código aberto
+- Baixe em: https://www.libreoffice.org/download/download/
+- Instale normalmente e o sistema detectará automaticamente
+
+### Verificação
+Para verificar se a conversão PDF está funcionando:
+1. Execute o sistema normalmente
+2. Verifique se dois arquivos foram criados na pasta `output/`:
+   - `proposta_YYYYMMDD_HHMMSS.pptx`
+   - `proposta_YYYYMMDD_HHMMSS.pdf`
 
 ## Solução de Problemas
 
@@ -139,12 +179,23 @@ O script irá:
   - Excel: `input/arquivo.xlsx`
   - Template: `templates/modelo.pptx`
 
+### PDF não é gerado
+- **Solução 1**: Instale o Microsoft PowerPoint (Office)
+- **Solução 2**: Instale o LibreOffice (gratuito)
+- **Solução 3**: Use a opção `--no-pdf` para gerar apenas PPTX
+
+### Erro: "Conversão para PDF não disponível"
+- **Solução**: Instale a dependência comtypes:
+  ```cmd
+  pip install comtypes
+  ```
+
 ## Estrutura de Pastas
 
 ```
 proposta_solar/
 ├── input/              # Coloque seus arquivos Excel aqui
-├── output/             # Apresentações geradas
+├── output/             # Apresentações geradas (PPTX e PDF)
 ├── templates/          # Coloque modelo.pptx aqui
 ├── gerar_proposta.bat  # Script para Windows
 ├── gerar_proposta.ps1  # Script PowerShell
@@ -157,4 +208,5 @@ Se você encontrar problemas:
 1. Verifique se o Python 3.8+ está instalado
 2. Certifique-se de que os arquivos estão nas pastas corretas
 3. Execute o script como administrador se necessário
-4. Verifique se não há antivírus bloqueando a execução 
+4. Verifique se não há antivírus bloqueando a execução
+5. Para problemas com PDF, instale PowerPoint ou LibreOffice 

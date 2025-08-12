@@ -79,7 +79,7 @@ if ! command -v gerar-proposta &> /dev/null; then
 fi
 
 # Executar script
-echo "🚀 Gerando apresentação..."
+echo "🚀 Gerando apresentação (PPTX e PDF)..."
 python -m proposta_solar.cli \
     --excel "$EXCEL_FILE" \
     --template "$TEMPLATE_FILE" \
@@ -89,7 +89,8 @@ python -m proposta_solar.cli \
 # Verificar resultado
     if [ $? -eq 0 ]; then
     echo "✅ Apresentação gerada com sucesso!"
-    echo "📄 Arquivo salvo em: $OUTPUT_FILE"
+    echo "📄 Arquivo PPTX salvo em: $OUTPUT_FILE"
+    echo "📄 Arquivo PDF salvo em: ${OUTPUT_FILE%.pptx}.pdf"
     
     # Abrir o arquivo no macOS
     if [[ "$OSTYPE" == "darwin"* ]]; then

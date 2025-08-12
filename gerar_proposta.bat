@@ -99,7 +99,7 @@ if errorlevel 1 (
 )
 
 REM Executar script
-echo 🚀 Gerando apresentação...
+echo 🚀 Gerando apresentação (PPTX e PDF)...
 python -m proposta_solar.cli ^
     --excel "%EXCEL_FILE%" ^
     --template "%TEMPLATE_FILE%" ^
@@ -109,7 +109,8 @@ python -m proposta_solar.cli ^
 REM Verificar resultado
 if %errorlevel% equ 0 (
     echo ✅ Apresentação gerada com sucesso!
-    echo 📄 Arquivo salvo em: %OUTPUT_FILE%
+    echo 📄 Arquivo PPTX salvo em: %OUTPUT_FILE%
+    echo 📄 Arquivo PDF salvo em: %OUTPUT_FILE:.pptx=.pdf%
     
     REM Abrir o arquivo no Windows
     start "" "%OUTPUT_FILE%"

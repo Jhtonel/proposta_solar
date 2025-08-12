@@ -98,7 +98,7 @@ try {
 }
 
 # Executar script
-Write-Host "🚀 Gerando apresentação..." -ForegroundColor Green
+Write-Host "🚀 Gerando apresentação (PPTX e PDF)..." -ForegroundColor Green
 try {
     python -m proposta_solar.cli `
         --excel $ExcelFile `
@@ -108,7 +108,8 @@ try {
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ Apresentação gerada com sucesso!" -ForegroundColor Green
-        Write-Host "📄 Arquivo salvo em: $OutputFile" -ForegroundColor Green
+        Write-Host "📄 Arquivo PPTX salvo em: $OutputFile" -ForegroundColor Green
+        Write-Host "📄 Arquivo PDF salvo em: $($OutputFile -replace '\.pptx$', '.pdf')" -ForegroundColor Green
         
         # Abrir o arquivo no Windows
         Start-Process $OutputFile

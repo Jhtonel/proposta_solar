@@ -7,12 +7,15 @@ Sistema para geração automática de propostas comerciais para projetos de ener
 - Leitura de dados de planilha Excel
 - Geração de gráficos personalizados
 - Substituição automática de variáveis em template PowerPoint
-- Geração de apresentação final em PowerPoint
+- Geração de apresentação final em PowerPoint (PPTX)
+- **Conversão automática para PDF**
+- Suporte multiplataforma (Windows, macOS, Linux)
 
 ## Requisitos
 
 - Python 3.8+
 - Dependências listadas em `requirements.txt`
+- **Para conversão PDF**: PowerPoint (Windows) ou LibreOffice (todas as plataformas)
 
 ## Instalação
 
@@ -102,12 +105,42 @@ pip install -e .
 2. Coloque seu template PowerPoint na pasta `templates/`
 3. Execute: `./gerar_proposta.command` ou `python -m proposta_solar.cli`
 
+### Opções de Linha de Comando
+
+```bash
+# Gerar PPTX e PDF (padrão)
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx
+
+# Gerar apenas PPTX (sem PDF)
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx --no-pdf
+
+# Com logs detalhados
+python -m proposta_solar.cli --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx --verbose
+```
+
+## Conversão para PDF
+
+O sistema gera automaticamente tanto o arquivo PPTX quanto o PDF. A conversão usa:
+
+### Windows
+- **PowerPoint** (recomendado) - Requer Microsoft PowerPoint instalado
+- **LibreOffice** (alternativa) - Se PowerPoint não estiver disponível
+
+### Linux/Mac
+- **LibreOffice** - Requer LibreOffice instalado
+
+### Instalação do LibreOffice
+- **Windows**: Baixe em https://www.libreoffice.org/download/download/
+- **macOS**: `brew install --cask libreoffice`
+- **Ubuntu/Debian**: `sudo apt install libreoffice`
+- **CentOS/RHEL**: `sudo yum install libreoffice`
+
 ## Estrutura do Projeto
 
 ```
 proposta_solar/
 ├── input/              # Arquivos Excel de entrada
-├── output/             # Apresentações geradas
+├── output/             # Apresentações geradas (PPTX e PDF)
 ├── templates/          # Templates PowerPoint
 ├── src/
 │   └── proposta_solar/
@@ -129,10 +162,17 @@ proposta_solar/
 - **Erro de política de execução no PowerShell**: Execute `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 - **Python não encontrado**: Certifique-se de que o Python está instalado e adicionado ao PATH
 - **Erro de codificação**: Execute o script em um terminal com suporte a UTF-8
+- **PDF não gerado**: Instale o PowerPoint ou LibreOffice
 
 ### Linux/Mac
 - **Permissão negada**: Execute `chmod +x gerar_proposta.command`
 - **Python não encontrado**: Instale o Python 3.8+ via gerenciador de pacotes
+- **PDF não gerado**: Instale o LibreOffice
+
+### Conversão PDF
+- **"Conversão para PDF não disponível"**: Instale `comtypes` com `pip install comtypes`
+- **"PowerPoint não encontrado"**: Instale o Microsoft PowerPoint ou LibreOffice
+- **"LibreOffice não encontrado"**: Instale o LibreOffice seguindo as instruções acima
 
 ## Contribuição
 

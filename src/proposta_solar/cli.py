@@ -12,6 +12,7 @@ def parse_args():
 Exemplos:
   %(prog)s -e input/dados.xlsx -t templates/modelo.pptx -o output/proposta.pptx
   %(prog)s --excel input/dados.xlsx --template templates/modelo.pptx --output output/proposta.pptx
+  %(prog)s -e input/dados.xlsx -t templates/modelo.pptx -o output/proposta.pptx --no-pdf
         """
     )
     
@@ -39,6 +40,12 @@ Exemplos:
         help='Exibir logs detalhados'
     )
     
+    parser.add_argument(
+        '--no-pdf',
+        action='store_true',
+        help='Não gerar arquivo PDF (apenas PPTX)'
+    )
+    
     return parser.parse_args()
 
 def main():
@@ -59,7 +66,8 @@ def main():
         excel_path=excel_path,
         template_path=template_path,
         output_path=output_path,
-        verbose=args.verbose
+        verbose=args.verbose,
+        save_pdf=not args.no_pdf
     )
 
 if __name__ == '__main__':
