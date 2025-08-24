@@ -45,6 +45,7 @@ O script irá:
 - Criar as pastas necessárias
 - Executar o sistema
 - **Gerar tanto PPTX quanto PDF**
+- **Formatar automaticamente valores monetários em R$**
 
 ### Método 2: PowerShell (Alternativa Moderna)
 
@@ -112,6 +113,7 @@ O script irá:
    - A apresentação PPTX será gerada na pasta `output/`
    - A apresentação PDF será gerada na pasta `output/`
    - O arquivo PPTX será aberto automaticamente
+   - **Todos os valores monetários serão formatados em R$**
 
 ### Opções de Linha de Comando
 
@@ -145,6 +147,112 @@ Para verificar se a conversão PDF está funcionando:
 2. Verifique se dois arquivos foram criados na pasta `output/`:
    - `proposta_YYYYMMDD_HHMMSS.pptx`
    - `proposta_YYYYMMDD_HHMMSS.pdf`
+
+## Formatação Automática
+
+### **O que é Formatado**
+O sistema detecta automaticamente e formata as seguintes variáveis:
+
+#### **Valores Monetários**
+- `valor_total` → R$ 30.178,57
+- `valor_total_1` → R$ 30.178,57
+- `valor_total_3` → R$ 30.178,57
+- `a_vista` → R$ 30.178,57
+- `a_vista_1` → R$ 30.178,57
+- `a_vista_3` → R$ 30.178,57
+
+#### **Parcelas**
+- `parcela1x` → R$ 2.514,88
+- `parcela2x` → R$ 1.257,44
+- `parcela3x` → R$ 838,29
+- ... até `parcela18x`
+
+#### **Financiamentos**
+- `fin12` → R$ 2.514,88
+- `fin24` → R$ 1.257,44
+- `fin36` → R$ 838,29
+- ... até `fin96`
+
+#### **Economias e Gastos**
+- `economia_5_anos` → R$ 15.000,00
+- `gasto_5_anos` → R$ 25.000,00
+- `saldo_anual_rs` → R$ 3.600,00
+
+#### **Datas**
+- `data` → 15/01/2024
+- `date` → 15/01/2024
+- `dia` → 15/01/2024
+- `mes` → 15/01/2024
+- `ano` → 15/01/2024
+- `periodo` → 15/01/2024
+- `inicio` → 15/01/2024
+- `fim` → 15/01/2024
+- `validade` → 15/01/2024
+- `vencimento` → 15/01/2024
+- `prazo` → 15/01/2024
+- `duracao` → 15/01/2024
+
+### **Formatos Aplicados**
+
+#### **Moeda (R$)**
+- **Símbolo**: R$ (com espaço)
+- **Separador de milhares**: Ponto (.)
+- **Separador decimal**: Vírgula (,)
+- **Casas decimais**: 2 dígitos
+- **Valores negativos**: -R$ 500,00
+
+#### **Data (dd/mm/aaaa)**
+- **Dia**: 2 dígitos (01-31)
+- **Mês**: 2 dígitos (01-12)
+- **Ano**: 4 dígitos (2024)
+- **Separadores**: Barra (/)
+- **Formato**: dd/mm/aaaa
+
+### **Formatos de Entrada Suportados**
+
+#### **Para Moeda**
+- Números: `30178.57`
+- Decimais: `30178.57142857142`
+- Strings numéricas: `"30178.57"`
+
+#### **Para Data**
+- `dd/mm/aaaa` → `dd/mm/aaaa` (mantém formato)
+- `dd/mm/aa` → `dd/mm/aaaa` (expande ano)
+- `aaaa-mm-dd` → `dd/mm/aaaa`
+- `aa-mm-dd` → `dd/mm/aaaa`
+- `dd-mm-aaaa` → `dd/mm/aaaa`
+- `dd-mm-aa` → `dd/mm/aaaa`
+- `dd.mm.aaaa` → `dd/mm/aaaa`
+- `dd.mm.aa` → `dd/mm/aaaa`
+- `aaaa/mm/dd` → `dd/mm/aaaa`
+- `aa/mm/dd` → `dd/mm/aaaa`
+- **Datas do Excel** (números) → `dd/mm/aaaa`
+
+### **Exemplos de Transformação**
+
+#### **Moeda**
+```
+Antes: 30178.57142857142
+Depois: R$ 30.178,57
+
+Antes: 2514.880952380952
+Depois: R$ 2.514,88
+```
+
+#### **Data**
+```
+Antes: 2024-01-15
+Depois: 15/01/2024
+
+Antes: 15/01/24
+Depois: 15/01/2024
+
+Antes: 15.01.2024
+Depois: 15/01/2024
+
+Antes: 45295 (data do Excel)
+Depois: 15/01/2024
+```
 
 ## Solução de Problemas
 
@@ -190,6 +298,26 @@ Para verificar se a conversão PDF está funcionando:
   pip install comtypes
   ```
 
+### Formatação Monetária Não Funciona
+- **Solução 1**: Verifique se o nome da variável contém padrões monetários
+- **Solução 2**: Confirme se o valor na planilha é numérico
+- **Solução 3**: Use `--verbose` para ver logs detalhados
+- **Solução 4**: Verifique se a função `formatar_moeda()` está sendo chamada
+
+### Formatação de Data Não Funciona
+- **Solução 1**: Verifique se o nome da variável contém padrões de data
+- **Solução 2**: Confirme se o valor na planilha é uma data válida
+- **Solução 3**: Verifique se o formato de entrada é suportado
+- **Solução 4**: Use `--verbose` para ver logs detalhados
+- **Solução 5**: Verifique se a função `formatar_data()` está sendo chamada
+
+### Problemas Gerais de Formatação
+- **Solução 1**: Verifique se as funções de formatação estão sendo chamadas
+- **Solução 2**: Confirme se o valor original é válido
+- **Solução 3**: Verifique se há caracteres especiais no valor
+- **Solução 4**: Use `--verbose` para identificar problemas
+- **Solução 5**: Verifique se o nome da variável contém padrões reconhecidos
+
 ## Estrutura de Pastas
 
 ```
@@ -199,7 +327,9 @@ proposta_solar/
 ├── templates/          # Coloque modelo.pptx aqui
 ├── gerar_proposta.bat  # Script para Windows
 ├── gerar_proposta.ps1  # Script PowerShell
-└── requirements.txt    # Dependências
+├── requirements.txt    # Dependências
+├── FORMATACAO_MONETARIA.md # Documentação da formatação monetária
+└── README.md
 ```
 
 ## Suporte
@@ -209,4 +339,5 @@ Se você encontrar problemas:
 2. Certifique-se de que os arquivos estão nas pastas corretas
 3. Execute o script como administrador se necessário
 4. Verifique se não há antivírus bloqueando a execução
-5. Para problemas com PDF, instale PowerPoint ou LibreOffice 
+5. Para problemas com PDF, instale PowerPoint ou LibreOffice
+6. Para problemas de formatação monetária, verifique os logs com `--verbose` 

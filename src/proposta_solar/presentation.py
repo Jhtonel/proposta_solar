@@ -32,6 +32,114 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def formatar_moeda(valor):
+    """Formata valor para formato monetário brasileiro (R$)"""
+    try:
+        # Converter para float se for string
+        if isinstance(valor, str):
+            # Remover caracteres não numéricos exceto ponto e vírgula
+            valor_limpo = re.sub(r'[^\d.,]', '', valor)
+            # Substituir vírgula por ponto para conversão
+            valor_limpo = valor_limpo.replace(',', '.')
+            valor = float(valor_limpo)
+        
+        # Formatar como moeda brasileira
+        if valor == 0:
+            return "R$ 0,00"
+        elif valor < 0:
+            return f"-R$ {abs(valor):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        else:
+            return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    except (ValueError, TypeError):
+        # Se não conseguir converter, retornar o valor original
+        return str(valor)
+
+def is_variavel_monetaria(var_name):
+    """Verifica se a variável deve ser formatada como moeda"""
+    var_lower = var_name.lower()
+    
+    # Lista de padrões para variáveis monetárias
+    padroes_monetarios = [
+        'valor_total', 'a_vista', 'parcela', 'fin', 'economia', 'gasto',
+        'saldo', 'fluxo', 'payback', 'custo'
+    ]
+    
+    return any(padrao in var_lower for padrao in padroes_monetarios)
+
+def formatar_data(valor):
+    """Formata valor para formato de data brasileiro (dd/mm/aaaa)"""
+    try:
+        # Se for string, tentar converter para data
+        if isinstance(valor, str):
+            # Remover espaços extras
+            valor = valor.strip()
+            
+            # Se já estiver no formato dd/mm/aaaa, retornar como está
+            if re.match(r'^\d{2}/\d{2}/\d{4}$', valor):
+                return valor
+            
+            # Tentar converter de diferentes formatos
+            from datetime import datetime
+            
+            # Lista de formatos possíveis
+            formatos_possiveis = [
+                '%d/%m/%Y', '%d/%m/%y',  # dd/mm/aaaa ou dd/mm/aa
+                '%Y-%m-%d', '%y-%m-%d',  # aaaa-mm-dd ou aa-mm-dd
+                '%d-%m-%Y', '%d-%m-%y',  # dd-mm-aaaa ou dd-mm-aa
+                '%d/%m/%Y', '%d/%m/%y',  # dd/mm/aaaa ou dd/mm/aa
+                '%d.%m.%Y', '%d.%m.%y',  # dd.mm.aaaa ou dd.mm.aa
+                '%Y/%m/%d', '%y/%m/%d',  # aaaa/mm/dd ou aa/mm/dd
+            ]
+            
+            for formato in formatos_possiveis:
+                try:
+                    data = datetime.strptime(valor, formato)
+                    return data.strftime('%d/%m/%Y')
+                except ValueError:
+                    continue
+            
+            # Se não conseguir converter com nenhum formato, tentar Excel
+            try:
+                # Para datas do Excel (número de dias desde 1900)
+                if valor.replace('.', '').replace(',', '').isdigit():
+                    from openpyxl.utils import datetime as openpyxl_datetime
+                    data_excel = openpyxl_datetime.from_excel(float(valor))
+                    return data_excel.strftime('%d/%m/%Y')
+            except:
+                pass
+        
+        # Se for datetime, formatar diretamente
+        elif hasattr(valor, 'strftime'):
+            return valor.strftime('%d/%m/%Y')
+        
+        # Se for número (possível data do Excel), tentar converter
+        elif isinstance(valor, (int, float)):
+            try:
+                from openpyxl.utils import datetime as openpyxl_datetime
+                data_excel = openpyxl_datetime.from_excel(valor)
+                return data_excel.strftime('%d/%m/%Y')
+            except:
+                pass
+        
+        # Se não conseguir converter, retornar o valor original
+        return str(valor)
+        
+    except Exception as e:
+        logger.warning(f"Erro ao formatar data '{valor}': {e}")
+        return str(valor)
+
+def is_variavel_data(var_name):
+    """Verifica se a variável deve ser formatada como data"""
+    var_lower = var_name.lower()
+    
+    # Lista de padrões para variáveis de data
+    padroes_data = [
+        'data', 'date', 'dia', 'mes', 'ano', 'periodo', 'inicio', 'fim',
+        'validade', 'vencimento', 'prazo', 'duracao'
+    ]
+    
+    return any(padrao in var_lower for padrao in padroes_data)
+
 class Config:
     """Gerencia configurações globais"""
     def __init__(self):
@@ -607,6 +715,14 @@ class PresentationManager:
                             # Tratamento especial para a variável cliente
                             if var_name.lower() == 'cliente' and slide_idx > 0:
                                 value = value.upper()
+                            
+                            # Formatar valor monetário se necessário
+                            if is_variavel_monetaria(var_name):
+                                value = formatar_moeda(value)
+                            
+                            # Formatar valor de data se necessário
+                            if is_variavel_data(var_name):
+                                value = formatar_data(value)
                             
                             logger.info(f"Tentando substituir {test_name} com valor: {value}")
                             

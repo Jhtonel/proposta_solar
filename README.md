@@ -9,6 +9,7 @@ Sistema para geração automática de propostas comerciais para projetos de ener
 - Substituição automática de variáveis em template PowerPoint
 - Geração de apresentação final em PowerPoint (PPTX)
 - **Conversão automática para PDF**
+- **Formatação automática de valores monetários em R$**
 - Suporte multiplataforma (Windows, macOS, Linux)
 
 ## Requisitos
@@ -135,6 +136,41 @@ O sistema gera automaticamente tanto o arquivo PPTX quanto o PDF. A conversão u
 - **Ubuntu/Debian**: `sudo apt install libreoffice`
 - **CentOS/RHEL**: `sudo yum install libreoffice`
 
+## Formatação Automática
+
+O sistema formata automaticamente todos os valores monetários e datas para os formatos brasileiros padrão:
+
+### **Formatação Monetária**
+- **Antes**: `30178.57142857142`
+- **Depois**: `R$ 30.178,57`
+
+### **Formatação de Data**
+- **Antes**: `2024-01-15`
+- **Depois**: `15/01/2024`
+
+### **Variáveis Formatadas**
+
+#### **Valores Monetários**
+- Valores totais: `valor_total`, `valor_total_1`, `valor_total_3`
+- Valores à vista: `a_vista`, `a_vista_1`, `a_vista_3`
+- Parcelas: `parcela1x`, `parcela2x`, `parcela3x`... até `parcela18x`
+- Financiamentos: `fin12`, `fin24`, `fin36`, `fin48`, `fin60`, `fin72`, `fin84`, `fin96`
+- Economias e gastos: `economia_5_anos`, `gasto_5_anos`, etc.
+
+#### **Datas**
+- Data principal: `data` (data da proposta)
+- Outras datas: `date`, `dia`, `mes`, `ano`, `periodo`, `inicio`, `fim`, `validade`, `vencimento`, `prazo`, `duracao`
+
+### **Formatos Suportados de Entrada**
+- **Moeda**: Números, decimais, strings numéricas
+- **Data**: dd/mm/aaaa, dd-mm-aaaa, aaaa-mm-dd, datas do Excel, múltiplos formatos
+
+### **Características**
+- **Moeda**: R$ com separador de milhares (.) e decimal (,)
+- **Data**: dd/mm/aaaa com barras como separadores
+- **Detecção**: Automática baseada no nome da variável
+- **Flexibilidade**: Múltiplos formatos de entrada suportados
+
 ## Estrutura do Projeto
 
 ```
@@ -153,6 +189,7 @@ proposta_solar/
 ├── gerar_proposta.ps1      # Script PowerShell para Windows
 ├── requirements.txt
 ├── setup.py
+├── FORMATACAO_MONETARIA.md # Documentação da formatação monetária
 └── README.md
 ```
 
@@ -165,7 +202,7 @@ proposta_solar/
 - **PDF não gerado**: Instale o PowerPoint ou LibreOffice
 
 ### Linux/Mac
-- **Permissão negada**: Execute `chmod +x gerar_proposta.command`
+- **Permissão negado**: Execute `chmod +x gerar_proposta.command`
 - **Python não encontrado**: Instale o Python 3.8+ via gerenciador de pacotes
 - **PDF não gerado**: Instale o LibreOffice
 
@@ -173,6 +210,11 @@ proposta_solar/
 - **"Conversão para PDF não disponível"**: Instale `comtypes` com `pip install comtypes`
 - **"PowerPoint não encontrado"**: Instale o Microsoft PowerPoint ou LibreOffice
 - **"LibreOffice não encontrado"**: Instale o LibreOffice seguindo as instruções acima
+
+### Formatação Monetária
+- **Valor não formatado**: Verifique se o nome da variável contém padrões monetários
+- **Formato incorreto**: Confirme se o valor na planilha é numérico
+- **Verificar funcionamento**: Use `--verbose` e procure por logs de formatação
 
 ## Contribuição
 

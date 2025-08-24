@@ -154,30 +154,30 @@ VARIAVEIS_SLIDES = {
     7: ['cliente'],
     8: ['cliente'],
     9: ['cliente', 'gasto_5_anos', 'gasto_10_anos', 'gasto_25_anos', 'economia_5_anos', 'economia_10_anos', 'economia_25_anos'],   
-    10: ['cliente', 'valor_total_1', 'a_vista_1', 'parcela1_1', 'parcela2_1', 'parcela3_1', 'parcela4_1', 'parcela5_1', 'parcela6_1', 'parcela7_1', 'parcela8_1', 'parcela9_1', 'parcela10_1', 'parcela11_1', 'parcela12_1', 'parcela13_1', 'parcela14_1', 'parcela15_1', 'parcela16_1', 'parcela17_1', 'parcela18_1', 'fin12_1', 'fin24_1', 'fin36_1', 'fin48_1', 'fin60_1', 'fin72_1', 'fin84_1', 'fin96_1'],                                                                         
-    11: ['cliente', 'valor_total', 'a_vista', 'parcela1', 'parcela2', 'parcela3', 'parcela4', 'parcela5', 'parcela6', 'parcela7', 'parcela8', 'parcela9', 'parcela10', 'parcela11', 'parcela12', 'parcela13', 'parcela14', 'parcela15', 'parcela16', 'parcela17', 'parcela18', 'fin12', 'fin24', 'fin36', 'fin48', 'fin60', 'fin72', 'fin84', 'fin96'],                                                                                                               
-    12: ['cliente', 'valor_total_3', 'a_vista_3', 'parcela1_3', 'parcela2_3', 'parcela3_3', 'parcela4_3', 'parcela5_3', 'parcela6_3', 'parcela7_3', 'parcela8_3', 'parcela9_3', 'parcela10_3', 'parcela11_3', 'parcela12_3', 'parcela13_3', 'parcela14_3', 'parcela15_3', 'parcela16_3', 'parcela17_3', 'parcela18_3', 'fin12_3', 'fin24_3', 'fin36_3', 'fin48_3', 'fin60_3', 'fin72_3', 'fin84_3', 'fin96_3'],                                                                                                               
+    10: ['cliente', 'valor_total_1', 'a_vista_1', 'parcela1x_1', 'parcela2x_1', 'parcela3x_1', 'parcela4x_1', 'parcela5x_1', 'parcela6x_1', 'parcela7x_1', 'parcela8x_1', 'parcela9x_1', 'parcela10x_1', 'parcela11x_1', 'parcela12x_1', 'parcela13x_1', 'parcela14x_1', 'parcela15x_1', 'parcela16x_1', 'parcela17x_1', 'parcela18x_1', 'fin12_1', 'fin24_1', 'fin36_1', 'fin48_1', 'fin60_1', 'fin72_1', 'fin84_1', 'fin96_1'],                                                                         
+    11: ['cliente', 'valor_total', 'a_vista', 'parcela1x', 'parcela2x', 'parcela3x', 'parcela4x', 'parcela5x', 'parcela6x', 'parcela7x', 'parcela8x', 'parcela9x', 'parcela10x', 'parcela11x', 'parcela12x', 'parcela13x', 'parcela14x', 'parcela15x', 'parcela16x', 'parcela17x', 'parcela18x', 'fin12', 'fin24', 'fin36', 'fin48', 'fin60', 'fin72', 'fin84', 'fin96'],                                                                                                               
+    12: ['cliente', 'valor_total_3', 'a_vista_3', 'parcela1x_3', 'parcela2x_3', 'parcela3x_3', 'parcela4x_3', 'parcela5x_3', 'parcela6x_3', 'parcela7x_3', 'parcela8x_3', 'parcela9x_3', 'parcela10x_3', 'parcela11x_3', 'parcela12x_3', 'parcela13x_3', 'parcela14x_3', 'parcela15x_3', 'parcela16x_3', 'parcela17x_3', 'parcela18x_3', 'fin12_3', 'fin24_3', 'fin36_3', 'fin48_3', 'fin60_3', 'fin72_3', 'fin84_3', 'fin96_3'],                                                                                                               
     13: ['cliente'],                                                                                                               
 }
 
 # Posições dos gráficos nos slides
 POSICOES_GRAFICOS = {
     'graph1': {
-        'slide': 1,
-        'left': 18.54,    # cm
-        'top': 8.83,      # cm
-        'width': 29.4,    # cm
-        'height': 17.02   # cm
-    },
-    'graph2': {
         'slide': 2,
         'left': 18.54,    # cm
         'top': 8.83,      # cm
         'width': 29.4,    # cm
         'height': 17.02   # cm
     },
-    'graph3': {
+    'graph2': {
         'slide': 3,
+        'left': 18.54,    # cm
+        'top': 8.83,      # cm
+        'width': 29.4,    # cm
+        'height': 17.02   # cm
+    },
+    'graph3': {
+        'slide': 4,
         'left': 18.54,    # cm
         'top': 8.83,      # cm
         'width': 29.4,    # cm
