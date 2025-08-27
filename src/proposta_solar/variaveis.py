@@ -139,7 +139,10 @@ VARIAVEIS_PLANILHA = {
     'valor_total_1': 'DT2',             # Valor total 1
     'a_vista_1': 'DU2',             # A vista 1
     'valor_total_3': 'DV2',             # Valor total 3
-    'a_vista_3': 'DW2'             # A vista 3
+    'a_vista_3': 'DW2',             # A vista 3
+    'creditos': 'DX2',             # Creditos
+    'creditos1': 'DY2',             # Creditos 1
+    'creditos3': 'DZ2'             # Creditos 3
 }
 
 # Mapeamento de variáveis por slide
@@ -150,7 +153,7 @@ VARIAVEIS_SLIDES = {
     3: ['cliente', 'por_que_aumenta'],                                                                                          
     4: ['cliente', 'com_energia_solar'],                                                                                             
     5: ['cliente', 'economia_5_anos', 'economia_10_anos', 'economia_25_anos'],                                                   
-    6: ['cliente', 'modulos1', 'modulos_quantidade1', 'inversor1', 'inversor_quantidade1', 'potencia1', 'geracao_media1', 'modulos','modulos_quantidade', 'inversor', 'inversor_quantidade', 'potencia', 'geracao_media', 'modulos3', 'modulos_quantidade3', 'inversor3', 'inversor_quantidade3', 'potencia3', 'geracao_media3'],                                                                                                                # Slide 6
+    6: ['cliente', 'modulos1', 'modulos_quantidade1', 'inversor1', 'inversor_quantidade1', 'potencia1', 'geracao_media1', 'modulos','modulos_quantidade', 'inversor', 'inversor_quantidade', 'potencia', 'geracao_media', 'modulos3', 'modulos_quantidade3', 'inversor3', 'inversor_quantidade3', 'potencia3', 'geracao_media3', 'creditos', 'creditos1', 'creditos3'],                                                                                                                # Slide 6
     7: ['cliente'],
     8: ['cliente'],
     9: ['cliente', 'gasto_5_anos', 'gasto_10_anos', 'gasto_25_anos', 'economia_5_anos', 'economia_10_anos', 'economia_25_anos'],   

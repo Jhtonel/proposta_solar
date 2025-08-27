@@ -175,45 +175,66 @@ O sistema formata automaticamente todos os valores monetários e datas para os f
 
 ```
 proposta_solar/
-├── input/              # Arquivos Excel de entrada
-├── output/             # Apresentações geradas (PPTX e PDF)
-├── templates/          # Templates PowerPoint
-├── src/
+├── input/                    # Arquivos Excel de entrada
+├── output/                   # Apresentações geradas (PPTX e PDF)
+├── templates/                # Templates PowerPoint
+├── src/                      # Código fonte Python
 │   └── proposta_solar/
 │       ├── __init__.py
-│       ├── cli.py
-│       ├── presentation.py
-│       └── variaveis.py
-├── gerar_proposta.command  # Script para Linux/Mac
-├── gerar_proposta.bat      # Script para Windows
-├── gerar_proposta.ps1      # Script PowerShell para Windows
-├── requirements.txt
-├── setup.py
-├── FORMATACAO_MONETARIA.md # Documentação da formatação monetária
-└── README.md
+│       ├── cli.py           # Interface de linha de comando
+│       ├── presentation.py  # Lógica principal
+│       └── variaveis.py     # Mapeamento de variáveis
+├── venv/                     # Ambiente virtual Python
+├── gerar_proposta.command   # Script para macOS/Linux
+├── gerar_proposta.bat       # Script para Windows
+├── gerar_proposta.ps1       # Script PowerShell
+├── requirements.txt          # Dependências Python
+├── setup.py                 # Configuração do pacote
+├── FORMATACAO_MONETARIA.md  # Documentação da formatação automática
+├── SOLUCAO_GRAFICO_CONSUMO.md # Solução para problema do gráfico
+└── README.md                # Este arquivo
 ```
 
 ## Solução de Problemas
 
-### Windows
-- **Erro de política de execução no PowerShell**: Execute `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
-- **Python não encontrado**: Certifique-se de que o Python está instalado e adicionado ao PATH
-- **Erro de codificação**: Execute o script em um terminal com suporte a UTF-8
-- **PDF não gerado**: Instale o PowerPoint ou LibreOffice
+### **Erros Comuns**
 
-### Linux/Mac
-- **Permissão negado**: Execute `chmod +x gerar_proposta.command`
-- **Python não encontrado**: Instale o Python 3.8+ via gerenciador de pacotes
-- **PDF não gerado**: Instale o LibreOffice
+#### **Erro no Slide 11**
+- **Sintoma**: "Falha ao substituir todas as variáveis no Slide 11"
+- **Causa**: Variáveis não encontradas ou mapeamento incorreto
+- **Solução**: Verificar se todas as variáveis estão definidas em `variaveis.py`
 
-### Conversão PDF
-- **"Conversão para PDF não disponível"**: Instale `comtypes` com `pip install comtypes`
-- **"PowerPoint não encontrado"**: Instale o Microsoft PowerPoint ou LibreOffice
-- **"LibreOffice não encontrado"**: Instale o LibreOffice seguindo as instruções acima
+#### **Gráfico de Consumo Não Exibe Barras Vermelhas**
+- **Sintoma**: Gráfico "Produção Mensal x Consumo Médio" mostra apenas barras verdes
+- **Causa**: Problema na leitura ou criação das barras de consumo
+- **Solução**: Verificar se as células `I5:I16` contêm dados de consumo válidos
+- **Documentação**: Ver `SOLUCAO_GRAFICO_CONSUMO.md`
 
-### Formatação Monetária
+#### **PDF não gerado**
+- **Sintoma**: Apenas arquivo PPTX é criado
+- **Causa**: PowerPoint ou LibreOffice não disponível
+- **Solução**: Instalar Microsoft PowerPoint ou LibreOffice
+
+#### **Permissão negado**
+- **Linux/Mac**: Execute `chmod +x gerar_proposta.command`
+- **Windows**: Execute como administrador se necessário
+
+#### **Python não encontrado**
+- **Linux/Mac**: Instale o Python 3.8+ via gerenciador de pacotes
+- **Windows**: Instale Python 3.8+ e adicione ao PATH
+
+#### **Dependências não encontradas**
+- **Solução**: Execute `pip install -r requirements.txt`
+- **Ambiente virtual**: Ative o ambiente virtual primeiro
+
+### **Formatação Monetária**
 - **Valor não formatado**: Verifique se o nome da variável contém padrões monetários
 - **Formato incorreto**: Confirme se o valor na planilha é numérico
+- **Verificar funcionamento**: Use `--verbose` e procure por logs de formatação
+
+### **Formatação de Data**
+- **Data não formatada**: Verifique se o nome da variável contém padrões de data
+- **Formato incorreto**: Confirme se o valor na planilha é uma data válida
 - **Verificar funcionamento**: Use `--verbose` e procure por logs de formatação
 
 ## Contribuição
