@@ -140,8 +140,8 @@ VARIAVEIS_PLANILHA = {
     'a_vista_1': 'DU2',             # A vista 1
     'valor_total_3': 'DV2',             # Valor total 3
     'a_vista_3': 'DW2',             # A vista 3
-    'creditos': 'DX2',             # Creditos
-    'creditos1': 'DY2',             # Creditos 1
+    'creditos': 'DY2',             # Creditos
+    'creditos1': 'DX2',             # Creditos 1
     'creditos3': 'DZ2'             # Creditos 3
 }
 
