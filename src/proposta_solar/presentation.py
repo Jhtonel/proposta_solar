@@ -58,6 +58,11 @@ def is_variavel_monetaria(var_name):
     """Verifica se a variável deve ser formatada como moeda"""
     var_lower = var_name.lower()
     
+    # Excluir variáveis de créditos da formatação monetária automática
+    # para manter o formato original da planilha (ex: "R$100")
+    if 'credito' in var_lower:
+        return False
+    
     # Lista de padrões para variáveis monetárias
     padroes_monetarios = [
         'valor_total', 'a_vista', 'parcela', 'fin', 'economia', 'gasto',

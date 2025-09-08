@@ -16,6 +16,9 @@ O sistema agora formata automaticamente:
 - **Financiamentos**: `fin12`, `fin24`, `fin36`, `fin48`, `fin60`, `fin72`, `fin84`, `fin96`
 - **Economias e Gastos**: `economia_5_anos`, `gasto_5_anos`, `saldo_anual_rs`, etc.
 
+### **Variáveis que NÃO Recebem Formatação Monetária**
+- **Créditos**: `creditos`, `creditos1`, `creditos3` - mantêm o formato original da planilha (ex: "R$100")
+
 ### **Formato Aplicado**
 ```
 Antes: 30178.57142857142
@@ -23,6 +26,13 @@ Depois: R$ 30.178,57
 
 Antes: 2514.880952380952
 Depois: R$ 2.514,88
+```
+
+### **Formato dos Créditos (Mantido Original)**
+```
+creditos: R$100 → R$100 (mantém formato original)
+creditos1: R$150 → R$150 (mantém formato original)
+creditos3: R$200 → R$200 (mantém formato original)
 ```
 
 ## 📅 Formatação de Data
@@ -102,6 +112,13 @@ parcela1x: 2514.880952380952 → R$ 2.514,88
 fin12: 2514.880952380952 → R$ 2.514,88
 economia_5_anos: 15000 → R$ 15.000,00
 gasto_5_anos: 25000 → R$ 25.000,00
+```
+
+### **Formatação dos Créditos (Sem Alteração)**
+```
+creditos: R$100 → R$100 (mantém formato original)
+creditos1: R$150 → R$150 (mantém formato original)
+creditos3: R$200 → R$200 (mantém formato original)
 ```
 
 ### **Formatação de Data**
