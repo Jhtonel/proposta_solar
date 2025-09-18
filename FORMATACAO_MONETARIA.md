@@ -18,6 +18,7 @@ O sistema agora formata automaticamente:
 
 ### **Variáveis que NÃO Recebem Formatação Monetária**
 - **Créditos**: `creditos`, `creditos1`, `creditos3` - mantêm o formato original da planilha (ex: "R$100")
+  - **Exceção**: No slide 6, essas variáveis são formatadas como moeda (R$ 2.695,88)
 
 ### **Formato Aplicado**
 ```
@@ -28,11 +29,17 @@ Antes: 2514.880952380952
 Depois: R$ 2.514,88
 ```
 
-### **Formato dos Créditos (Mantido Original)**
+### **Formato dos Créditos**
 ```
+# Em todos os slides exceto o slide 6:
 creditos: R$100 → R$100 (mantém formato original)
 creditos1: R$150 → R$150 (mantém formato original)
 creditos3: R$200 → R$200 (mantém formato original)
+
+# No slide 6 (formatação monetária):
+creditos: 2695.88192 → R$ 2.695,88
+creditos1: 1500.50 → R$ 1.500,50
+creditos3: 2000.00 → R$ 2.000,00
 ```
 
 ## 📅 Formatação de Data
@@ -114,11 +121,17 @@ economia_5_anos: 15000 → R$ 15.000,00
 gasto_5_anos: 25000 → R$ 25.000,00
 ```
 
-### **Formatação dos Créditos (Sem Alteração)**
+### **Formatação dos Créditos**
 ```
+# Em todos os slides exceto o slide 6:
 creditos: R$100 → R$100 (mantém formato original)
 creditos1: R$150 → R$150 (mantém formato original)
 creditos3: R$200 → R$200 (mantém formato original)
+
+# No slide 6 (formatação monetária):
+creditos: 2695.88192 → R$ 2.695,88
+creditos1: 1500.50 → R$ 1.500,50
+creditos3: 2000.00 → R$ 2.000,00
 ```
 
 ### **Formatação de Data**

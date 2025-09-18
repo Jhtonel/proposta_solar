@@ -725,6 +725,10 @@ class PresentationManager:
                             if is_variavel_monetaria(var_name):
                                 value = formatar_moeda(value)
                             
+                            # Formatar variáveis de créditos no slide 6 como moeda
+                            if slide_idx == 6 and var_name.lower() in ['creditos', 'creditos1', 'creditos3']:
+                                value = formatar_moeda(value)
+                            
                             # Formatar valor de data se necessário
                             if is_variavel_data(var_name):
                                 value = formatar_data(value)
